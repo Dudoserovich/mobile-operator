@@ -15,7 +15,9 @@ class TariffController {
         if (!name || !subscription_fee || !internet_traffic || !minutes || !sms) {
             return next(ApiError.badRequest('Не все поля заполнены!'))
         }
-        internet_traffic === -1 ? '-1.00' : internet_traffic
+        if (internet_traffic === -1) {
+            '-1.00'
+        }
         const tariff = await Tariff.create({
             name,
             subscription_fee,

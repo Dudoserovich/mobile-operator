@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {observer} from 'mobx-react-lite'
-import {Button, Col, Container, Form, Modal, Row, Table} from 'react-bootstrap'
+import {Button, Col, Container, Form, Modal, Table} from 'react-bootstrap'
 import {Context} from '../index'
 import {changeTariff, createTariff, deleteTariff, findTariffs, getAllTariffs, getTariff} from '../http/tariffAPI'
 
@@ -13,7 +13,6 @@ const Manager = observer(() => {
     const [sms, setSms] = useState(100)
 
     const [findTariff, setFindTariff] = useState('')
-    const [findType, setFindType] = useState('')
 
     const [modalShow, setModalShow] = useState(false)
     const [modalTariff, setModalTariff] = useState({})

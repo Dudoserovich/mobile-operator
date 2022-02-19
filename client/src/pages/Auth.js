@@ -19,7 +19,6 @@ const Auth = observer(() => {
             user.setIsAuth(true)
             user.setTypeId(data.userTypeId)
             user.setLogin(data.login)
-            console.log('id:', user.typeId, user.isAuth)
             if (user.typeId === 1) {
                 navigate(ADMIN_ROUTE)
             } else if (user.typeId === 2) {
@@ -52,13 +51,13 @@ const Auth = observer(() => {
                         />
                     </Form.Group>
 
-                    <Form.Group className="mb-3" controlId="formLogin">
+                    <Form.Group className="mb-3" controlId="formPassword">
                         <Form.Label>Пароль</Form.Label>
                         <Form.Control
                             placeholder="Пароль"
                             value={password}
-                            onChange={e => setPassword(e.target.value)}
                             type="password"
+                            onChange={e => setPassword(e.target.value)}
                         />
                     </Form.Group>
                     <Button
