@@ -35,7 +35,19 @@ export const findTariffs = async (name) => {
     return data
 }
 
-export const changeTariff = async (name, newName, newSubscriptionFee, newInternetTraffic, newMinutes, newSms) => {
-    const {data} = await $host.put('api/tariff/change', {name, newName, newSubscriptionFee, newInternetTraffic, newMinutes, newSms})
+export const changeTariff = async (name,
+                                   newName,
+                                   newSubscriptionFee,
+                                   newInternetTraffic,
+                                   newMinutes,
+                                   newSms) => {
+    const {data} = await $host.put('api/tariff/change', {
+        name,
+        newName,
+        newSubscriptionFee,
+        newInternetTraffic,
+        newMinutes,
+        newSms
+    })
     return data
 }
