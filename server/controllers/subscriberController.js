@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Subscriber} = require("../models/models")
+const {Subscriber, Client} = require("../models/models")
 
 class SubscriberController {
     async getAll(req, res) {
@@ -10,7 +10,12 @@ class SubscriberController {
     async create(req, res) {}
 
     async getOne(req, res, next) {
-
+        // const {passport} = req.body
+        // const client = Client.findOne({where: {passport}})
+        // if (!client) {
+        //     return next(ApiError.badRequest('Клиетн не зарегистрирован'))
+        // }
+        // return res.json(client)
     }
 }
 

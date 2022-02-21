@@ -47,7 +47,7 @@ const Client = sequelize.define('client', {
 })
 
 const RegistrationPlace = sequelize.define('registration_place', {
-    id: {type: DataTypes.INTEGER, primaryKey: true},
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
     registration_place: {type: DataTypes.STRING}
 }, {
     timestamps: false
