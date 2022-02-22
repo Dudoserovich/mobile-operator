@@ -2,11 +2,10 @@ import React, {useContext, useEffect, useState} from 'react'
 import {observer} from 'mobx-react-lite'
 import {Button, Col, Container, Form, Modal, Table} from 'react-bootstrap'
 import {Context} from '../index'
-import {createClient, getOneClient} from "../http/salesmanAPI";
-import alert from "bootstrap/js/src/alert";
+import {createClient, findAllClients, getOneClient} from '../http/salesmanAPI'
 
 const Salesman = observer(() => {
-    const {tariff} = useContext(Context)
+    const {currentClient} = useContext(Context)
     const [passport, setPassport] = useState('')
     const [fio, setFio] = useState('')
     const [birthDate, setBirthDate] = useState('')
@@ -15,21 +14,29 @@ const Salesman = observer(() => {
     const [findTariff, setFindTariff] = useState('')
 
     const [modalShow, setModalShow] = useState(false)
-    const [modalTariff, setModalTariff] = useState({})
+    const [modalClient, setModalClient] = useState({})
+    const [modalSubscribers, setModalSubscribers] = useState([])
 
-    // useEffect(() => {
-    //     getAllTariffs()
-    //         .then(data => tariff.setTariffs(data))
-    // }, [])
+    useEffect(() => {
+        findAll(passport).then(data => {
+            if (data) {
+                currentClient.setClients(data)
+            }
+        })
+    }, [])
 
     const create = async () => {
         try {
-            alert('я заебался')
-            const {data} = await createClient(passport, fio, birthDate, regPlace)
-
-            return data
+            return await createClient(passport, fio, birthDate, regPlace)
         } catch (e) {
-            alert('zalupa konya')
+            alert(e.response.data.message)
+        }
+    }
+
+    const findAll = async (passport) => {
+        try {
+            return await findAllClients(passport)
+        } catch (e) {
             alert(e.response.data.message)
         }
     }
@@ -59,89 +66,98 @@ const Salesman = observer(() => {
     //     }
     // }
 
-    // const MyVerticallyCenteredModal = (props) => {
-    //     const [tariffName, setTariffName] = useState(props.tariff.name)
-    //     const [subscriptionFee, setSubscriptionFee] = useState(props.tariff.subscription_fee)
-    //     const [internetTraffic, setInternetTraffic] = useState(props.tariff.internet_traffic)
-    //     const [minutes, setMinutes] = useState(props.tariff.minutes)
-    //     const [sms, setSms] = useState(props.tariff.sms)
-    //
-    //     const change = async () => {
-    //         try {
-    //             await changeTariff(props.tariff.name, tariffName, subscriptionFee, internetTraffic, minutes, sms)
-    //             getAllTariffs()
-    //                 .then(data => tariff.setTariffs(data))
-    //         } catch (e) {
-    //             alert(e.response.data.message)
-    //         }
-    //     }
-    //
-    //     return (
-    //         <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
-    //             <Modal.Header closeButton>
-    //                 <Modal.Title id="contained-modal-title-vcenter">
-    //                     Изменение тарифа
-    //                 </Modal.Title>
-    //             </Modal.Header>
-    //             <Modal.Body>
-    //                 <Form className="">
-    //                     <Col md={4} style={{padding: '5px'}}>
-    //                         <Form.Group controlId="formUpdateTariffName">
-    //                             <Form.Text className="text-muted">
-    //                                 Название тарифа
-    //                             </Form.Text>
-    //                             <Form.Control size="lg" type="text" value={tariffName} placeholder="Название тарифа"
-    //                                           onChange={(e) => setTariffName(e.target.value)}/>
-    //                         </Form.Group>
-    //                     </Col>
-    //                     <Col md={2} style={{padding: '5px'}}>
-    //                         <Form.Group controlId="formUpdateTariffSubscriptionFee">
-    //                             <Form.Text className="text-muted">
-    //                                 Абонентская плата
-    //                             </Form.Text>
-    //                             <Form.Control type="number" placeholder="Абонентская плата" value={subscriptionFee}
-    //                                           onChange={(e) => setSubscriptionFee(e.target.value)}/>
-    //                         </Form.Group>
-    //                     </Col>
-    //                     <Col md={2} style={{padding: '5px'}}>
-    //                         <Form.Group controlId="formUpdateTariffInternetTraffic">
-    //                             <Form.Text className="text-muted">
-    //                                 Интернет траффик
-    //                             </Form.Text>
-    //                             <Form.Control type="number" placeholder="Интернет траффик" value={internetTraffic}
-    //                                           onChange={(e) => setInternetTraffic(e.target.value)}/>
-    //                         </Form.Group>
-    //                     </Col>
-    //                     <Col md={2} style={{padding: '5px'}}>
-    //                         <Form.Group controlId="formUpdateTariffMinutes">
-    //                             <Form.Text className="text-muted">
-    //                                 Минуты
-    //                             </Form.Text>
-    //                             <Form.Control type="number" placeholder="Минуты" value={minutes}
-    //                                           onChange={(e) => setMinutes(e.target.value)}/>
-    //                         </Form.Group>
-    //                     </Col>
-    //                     <Col md={2} style={{padding: '5px'}}>
-    //                         <Form.Group controlId="formUpdateTariffMinutes">
-    //                             <Form.Text className="text-muted">
-    //                                 SMS
-    //                             </Form.Text>
-    //                             <Form.Control type="number" placeholder="SMS" value={sms}
-    //                                           onChange={(e) => setSms(e.target.value)}/>
-    //                         </Form.Group>
-    //                     </Col>
-    //                 </Form>
-    //             </Modal.Body>
-    //             <Modal.Footer>
-    //                 <Button onClick={() => {
-    //                     change().then(data => {
-    //                         props.onHide()
-    //                     })
-    //                 }}>Сохранить изменения</Button>
-    //             </Modal.Footer>
-    //         </Modal>
-    //     )
-    // }
+    const MyVerticallyCenteredModal = (props) => {
+        const [fullName, setFullName] = useState(props.client.full_name)
+        const [dateOfBirth, setDateOfBirth] = useState(`${props.client.date_of_birth}`.slice(0, 10))
+        const [passport, setPassport] = useState(props.client.passport)
+        // const [minutes, setMinutes] = useState(props.client.minutes)
+        // const [sms, setSms] = useState(props.client.sms)
+
+        const change = async () => {
+            try {
+                // await changeTariff(props.tariff.name, tariffName, subscriptionFee, internetTraffic, minutes, sms)
+                // getAllTariffs()
+                //     .then(data => tariff.setTariffs(data))
+            } catch (e) {
+                alert(e.response.data.message)
+            }
+        }
+
+        const setTable = () => {
+            if (currentClient.subscribers.length) {
+                currentClient.subscribers.map((sub, index) => {
+                        return (
+                            <tr key={sub.account}>
+                                <td>{index + 1}</td>
+                                <td>{sub.account}</td>
+                                <td>{sub.balance}</td>
+                                <td>{sub.tariffName}</td>
+                                <td>
+                                    <Button className="me-4" variant="outline-warning"
+                                    >Изменить</Button>
+                                    <Button variant="outline-danger">Удалить</Button>
+                                </td>
+                            </tr>
+                        )
+                    }
+                )
+            } else {
+                return 'Нет абонентов'
+            }
+        }
+
+        return (
+            <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title id="contained-modal-title-vcenter">
+                        Изменение тарифа
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Form>
+                        <Col md={4} style={{padding: '5px'}}>
+                            <Form.Group controlId="formClientPassport">
+                                <Form.Text className="text-muted">
+                                    Серия и номер паспорта
+                                </Form.Text>
+                                <Form.Control type="number" placeholder="Серия и номер паспорта" value={passport}
+                                              onChange={(e) => setPassport(e.target.value)}/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={12} style={{padding: '5px'}}>
+                            <Form.Group controlId="formClientFullName">
+                                <Form.Text className="text-muted">
+                                    ФИО
+                                </Form.Text>
+                                <Form.Control size="lg" type="text" value={fullName} placeholder="ФИО"
+                                              onChange={(e) => setFullName(e.target.value)}/>
+                            </Form.Group>
+                        </Col>
+                        <Col md={4} style={{padding: '5px'}}>
+                            <Form.Group controlId="formClientBirth">
+                                <Form.Text className="text-muted">
+                                    Дата рождения
+                                </Form.Text>
+                                <Form.Control type="date" placeholder="Дата рождения" value={dateOfBirth}
+                                              onChange={(e) => setDateOfBirth(e.target.value)}/>
+                            </Form.Group>
+                        </Col>
+                        <Button variant="outline-success">Добавить абонента</Button>
+                    </Form>
+                    {
+                        setTable()
+                    }
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => {
+                        change().then(data => {
+                            props.onHide()
+                        })
+                    }}>Сохранить изменения</Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    }
 
     return (
         <div>
@@ -161,24 +177,37 @@ const Salesman = observer(() => {
                                 value={passport}
                                 type="text"
                                 placeholder="Серия и номер паспорта"
-                                onChange={e => setPassport(e.target.value)}/>
+                                onChange={e => {
+                                    findAll(e.target.value).then(data => {
+                                        console.log(data)
+                                        currentClient.setClients(data)
+                                    })
+                                    setPassport(e.target.value)
+                                }}/>
                         </Form.Group>
                     </Col>
-                    <Col md={3} style={{padding: '5px'}}>
-                        <Button
-                            variant="outline-success"
-                            type="submit"
-                            onClick={
-                                () => {
-                                    find().then(data => {
-                                        if (data) {
-                                            setModalShow(true)
-                                        }
-                                    })
-                                }
-                            }>Найти совпадения</Button>
-                    </Col>
                 </Form>
+                {
+                    currentClient.clients.length ?
+                    currentClient.clients.map((client, index) => {
+                            return (
+                                <tr key={client.passport}>
+                                    <td>{index + 1}</td>
+                                    <td>{client.passport}</td>
+                                    <td>{client.full_name}</td>
+                                    <td>{client.date_of_birth}</td>
+                                    <td>{client.registrationPlaceId}</td>
+                                    <td>
+                                        <Button className="me-4" variant="outline-warning"
+                                        >Изменить</Button>
+                                        <Button variant="outline-danger">Удалить</Button>
+                                    </td>
+                                </tr>
+                            )
+                        }
+                    )
+                        : 'Нет совпадений'
+                }
             </Container>
             <Container>
                 <h2 className="mt-4">Добавить нового клиента</h2>
@@ -234,21 +263,21 @@ const Salesman = observer(() => {
                     <Col md={2} style={{padding: '5px'}}>
                         <Button
                             variant="outline-success"
-                            type="submit"
                             onClick={() => {
+                                console.log(birthDate)
                                 create()
                                     .then(data => {
-                                        console.log(data.message)
                                         alert(data.message)
                                     })
                             }}>Добавить</Button>
                     </Col>
                 </Form>
             </Container>
-            {/*<MyVerticallyCenteredModal*/}
-            {/*    tariff={modalTariff}*/}
-            {/*    show={modalShow}*/}
-            {/*    onHide={() => setModalShow(false)}/>*/}
+            <MyVerticallyCenteredModal
+                client={modalClient}
+                subscribers={modalSubscribers}
+                show={modalShow}
+                onHide={() => setModalShow(false)}/>
         </div>
     )
 })

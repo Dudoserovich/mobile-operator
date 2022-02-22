@@ -8,5 +8,6 @@ const clientController = require('../controllers/clientController')
 
 router.get('/:passport', clientController.getOne)
 router.post('/', clientController.create)
+router.post('/find', clientController.findAll)
 
 module.exports = router

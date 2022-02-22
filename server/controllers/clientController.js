@@ -1,5 +1,6 @@
-const {Client, RegistrationPlace} = require('../models/models')
+const {Client, RegistrationPlace, Subscriber} = require('../models/models')
 const ApiError = require('../error/ApiError')
+const {Op} = require("sequelize");
 
 class ClientController {
     async getOne(req, res, next) {
@@ -8,6 +9,21 @@ class ClientController {
         if (!client) {
             return next(ApiError.badRequest('Такой клиент не зарегистрирован'))
         }
+        const subscribers = await Subscriber.findAll({where: {clientPassport: passport}})
+        return res.json({client, subscribers})
+    }
+
+    async findAll(req, res, next) {
+        const {passport} = req.body
+        const client = await Client.findOne({
+            where: {
+                passport: {
+                    [Op.eq]: [passport]
+                }
+            }
+        })
+        const regPlace = await RegistrationPlace.findOne({where: {id: client.registrationPlaceId}})
+        client.dataValues.reg = regPlace.registration_place
         return res.json(client)
     }
 
@@ -19,13 +35,9 @@ class ClientController {
             registrationPlace
         } = req.body
         const client = await Client.findOne({where: {passport}})
-        console.log(client)
-        console.log('shit before if')
         if (client) {
-            console.log('есть ебучий клиент')
             return next(ApiError.badRequest('Такой клиент уже зарегистрирован'))
         }
-        console.log('shit after if')
         let regPlace = await RegistrationPlace.findOne({where: {registration_place: registrationPlace}})
         if (!regPlace) {
             await RegistrationPlace.create({registration_place: registrationPlace})
