@@ -17,13 +17,13 @@ const Salesman = observer(() => {
     const [modalClient, setModalClient] = useState({})
     const [modalSubscribers, setModalSubscribers] = useState([])
 
-    useEffect(() => {
-        findAll(passport).then(data => {
-            if (data) {
-                currentClient.setClients(data)
-            }
-        })
-    }, [])
+    // useEffect(() => {
+    //     findAll(passport).then(data => {
+    //         if (data) {
+    //             currentClient.setClients(data)
+    //         }
+    //     })
+    // }, [])
 
     const create = async () => {
         try {
@@ -187,27 +187,37 @@ const Salesman = observer(() => {
                         </Form.Group>
                     </Col>
                 </Form>
-                {
-                    currentClient.clients.length ?
-                    currentClient.clients.map((client, index) => {
-                            return (
-                                <tr key={client.passport}>
-                                    <td>{index + 1}</td>
-                                    <td>{client.passport}</td>
-                                    <td>{client.full_name}</td>
-                                    <td>{client.date_of_birth}</td>
-                                    <td>{client.registrationPlaceId}</td>
-                                    <td>
-                                        <Button className="me-4" variant="outline-warning"
-                                        >Изменить</Button>
-                                        <Button variant="outline-danger">Удалить</Button>
-                                    </td>
-                                </tr>
+                <Table className="mt-4" hover={true}>
+                    <thead>
+                    <tr>
+                        <th>Паспортные данные</th>
+                        <th>ФИО</th>
+                        <th>Дата рождения</th>
+                        <th>Должность</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {
+                        currentClient.clients.length ?
+                            currentClient.clients.map((client, index) => {
+                                    return (
+                                        <tr key={client.passport}>
+                                            <td>{client.passport}</td>
+                                            <td>{client.full_name}</td>
+                                            <td>{new Date(client.date_of_birth).toLocaleDateString()}</td>
+                                            <td>{client.reg}</td>
+                                            <td>
+                                                <Button className="me-4" variant="outline-warning"
+                                                >Изменить</Button>
+                                            </td>
+                                        </tr>
+                                    )
+                                }
                             )
-                        }
-                    )
-                        : 'Нет совпадений'
-                }
+                            : <tr><td>Нет совпадений</td></tr>
+                    }
+                    </tbody>
+                </Table>
             </Container>
             <Container>
                 <h2 className="mt-4">Добавить нового клиента</h2>

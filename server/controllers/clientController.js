@@ -22,9 +22,12 @@ class ClientController {
                 }
             }
         })
+        if (!client) {
+            return res.json([])
+        }
         const regPlace = await RegistrationPlace.findOne({where: {id: client.registrationPlaceId}})
         client.dataValues.reg = regPlace.registration_place
-        return res.json(client)
+        return res.json([client])
     }
 
     async create(req, res, next) {
