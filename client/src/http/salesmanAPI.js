@@ -20,3 +20,9 @@ export const findAllClients = async (passport) => {
     const {data} = await $host.post('api/client/find', {passport})
     return data
 }
+
+export const allTariffs = async () => {
+    const {data} = await $host.get('api/tariff')
+    console.log(data)
+    return data
+}

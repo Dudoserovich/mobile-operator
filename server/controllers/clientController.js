@@ -26,7 +26,10 @@ class ClientController {
             return res.json([])
         }
         const regPlace = await RegistrationPlace.findOne({where: {id: client.registrationPlaceId}})
+        const subscribers = await Subscriber.findAll({where: {clientPassport: passport}})
         client.dataValues.reg = regPlace.registration_place
+        client.dataValues.subs = subscribers
+
         return res.json([client])
     }
 

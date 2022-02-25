@@ -20,7 +20,8 @@ const Admin = observer(() => {
     const [modalUser, setModalUser] = useState({})
 
     useEffect(() => {
-        getAllManagerAndSalesman().then(data => user.setDownloadedUsers(data))
+        getAllManagerAndSalesman()
+            .then(data => user.setDownloadedUsers(data))
     }, [])
 
     const userRegistration = async () => {

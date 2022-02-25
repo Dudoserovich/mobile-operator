@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError')
-const {Subscriber, Client} = require("../models/models")
+const {Subscriber} = require("../models/models")
 
 class SubscriberController {
     async getAll(req, res) {

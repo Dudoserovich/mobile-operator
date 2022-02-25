@@ -3,7 +3,7 @@ const {DataTypes} = require('sequelize')
 
 const User = sequelize.define('user', {
     login: {type: DataTypes.STRING, unique: true, allowNull: false, primaryKey: true},
-    password: {type: DataTypes.STRING, allowNull: false},
+    password: {type: DataTypes.STRING, allowNull: false}
 }, {
     timestamps: false
 })
@@ -16,14 +16,14 @@ const UserType = sequelize.define('user_type', {
 })
 
 const PhoneNumber = sequelize.define('phone_number', {
-    phone_number: {type: DataTypes.BIGINT, primaryKey: true},
+    phone_number: {type: DataTypes.BIGINT, primaryKey: true}
 }, {
     timestamps: false
 })
 
 const Subscriber = sequelize.define('subscriber', {
     account: {type: DataTypes.CHAR(20), primaryKey: true},
-    balance: {type: DataTypes.DECIMAL(8,2), defaultValue: 0.00},
+    balance: {type: DataTypes.DECIMAL(8,2), defaultValue: 0.00}
 }, {
     timestamps: false
 })
