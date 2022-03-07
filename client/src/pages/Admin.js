@@ -4,6 +4,7 @@ import {Button, Col, Container, Form, Modal, Table} from 'react-bootstrap'
 import {Context} from '../index'
 import {changeUser, deleteUser, findManagerAndSalesman, getAllManagerAndSalesman, getUser} from '../http/adminAPI'
 import {registration} from '../http/userAPI'
+import {changeTariff, getAllTariffs} from "../http/tariffAPI";
 
 const person = 'https://www.svgrepo.com/show/311063/person.svg'
 
@@ -24,12 +25,18 @@ const Admin = observer(() => {
             .then(data => user.setDownloadedUsers(data))
     }, [])
 
+    const validate = () => {
+        return document.querySelector('.is-invalid') === null
+    }
+
     const userRegistration = async () => {
-        try {
-            await registration(login, password, userType)
-        } catch (e) {
-            alert(e.response.data.message)
-        }
+        if (validate()) {
+            try {
+                await registration(login, password, userType)
+            } catch (e) {
+                alert(e.response.data.message)
+            }
+        } else alert('Не все поля корректны!')
     }
 
     const find = async (findLogin, findType) => {
@@ -61,18 +68,21 @@ const Admin = observer(() => {
     }
 
     const MyVerticallyCenteredModal = (props) => {
-        const [login, setLogin] = useState(props.user.login)
-        const [password, setPassword] = useState(props.user.password)
-        const [userTypeId, setUserType] = useState(props.user.userTypeId)
+        const [login, setLogin] = useState(props.user.login || '')
+        const [password, setPassword] = useState(props.user.password || '')
+        const [userTypeId, setUserType] = useState(props.user.userTypeId || '')
 
         const change = async () => {
-            try {
-                await changeUser(props.user.login, login, password, userTypeId)
-                getAllManagerAndSalesman()
-                    .then(data => user.setDownloadedUsers(data))
-            } catch (e) {
-                alert(e.response.data.message)
-            }
+            if (document.querySelector('.modalForm div div .form-control.is-invalid') === null) {
+                //alert('All done!')
+                try {
+                    await changeUser(props.user.login, login, password, userTypeId)
+                    getAllManagerAndSalesman()
+                        .then(data => user.setDownloadedUsers(data))
+                } catch (e) {
+                    alert(e.response.data.message)
+                }
+            } else alert('Не все поля корректны!')
         }
 
         return (
@@ -83,14 +93,19 @@ const Admin = observer(() => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form className="">
+                    <Form className="modalForm">
                         <Col md={5} style={{padding: '5px'}}>
                             <Form.Group controlId="formRegistrationLogin">
                                 <Form.Text className="text-muted">
                                     Логин пользователя
                                 </Form.Text>
                                 <Form.Control size="lg" type="text" value={login}
-                                              onChange={(e) => setLogin(e.target.value)} placeholder="Логин"/>
+                                              onChange={(e) => setLogin(e.target.value.replace(/ /g, ''))} placeholder="Логин"
+                                              isInvalid={!(login.length > 0 && login.length <= 32)}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Логин не может быть пустым или больше чем 32 символа
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                         <Col md={5} style={{padding: '5px'}}>
@@ -112,7 +127,12 @@ const Admin = observer(() => {
                                 </Form.Text>
                                 <Form.Control value={password} onChange={(e) => {
                                     setPassword(e.target.value)
-                                }} type="text" placeholder="Пароль"/>
+                                }} type="text" placeholder="Пароль"
+                                              isInvalid={!(password.length > 0 && password.length <= 32)}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    Пароль не может быть пустым или больше чем 32 символа
+                                </Form.Control.Feedback>
                             </Form.Group>
                         </Col>
                     </Form>
@@ -120,7 +140,10 @@ const Admin = observer(() => {
                 <Modal.Footer>
                     <Button onClick={() => {
                         change().then(data => {
-                            props.onHide()
+                            if (document.querySelector('.modalForm div div .form-control.is-invalid') === null) {
+                                props.onHide()
+                                alert('Пользователь изменён')
+                            }
                         })
                     }}>Сохранить изменения</Button>
                 </Modal.Footer>
@@ -161,7 +184,12 @@ const Admin = observer(() => {
                                 value={login}
                                 type="text"
                                 onChange={e => setLogin(e.target.value)}
-                                placeholder="Логин"/>
+                                placeholder="Логин"
+                                isInvalid={!(login.length > 0 && login.length <= 32)}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                Логин не может быть пустым или больше чем 32 символа
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col md={5} style={{padding: '5px'}}>
@@ -173,7 +201,12 @@ const Admin = observer(() => {
                                 value={password}
                                 type="password"
                                 onChange={e => setPassword(e.target.value)}
-                                placeholder="Пароль"/>
+                                placeholder="Пароль"
+                                isInvalid={!(password.length > 0 && password.length <= 32)}
+                            />
+                            <Form.Control.Feedback type="invalid">
+                                Пароль не может быть пустым или больше чем 32 символа
+                            </Form.Control.Feedback>
                         </Form.Group>
                     </Col>
                     <Col md={2} style={{padding: '5px'}}>
@@ -193,8 +226,8 @@ const Admin = observer(() => {
                                 Введите логин пользователя
                             </Form.Text>
                             <Form.Control value={findLogin} type="text" placeholder="Найти" onChange={(e) => {
-                                setFindLogin(e.target.value)
-                                find(e.target.value, findType).then(data => user.setDownloadedUsers(data))
+                                setFindLogin(e.target.value.replace(/ /g, ''))
+                                find(e.target.value.replace(/ /g, ''), findType).then(data => user.setDownloadedUsers(data))
                             }}/>
                         </Form.Group>
                     </Col>
@@ -244,6 +277,7 @@ const Admin = observer(() => {
                                             }}>Изменить</Button>
                                             <Button variant="outline-danger" onClick={() => {
                                                 delUser(user.login)
+                                                alert(`Пользователь с логином "${user.login}" удалён`)
                                             }}>Удалить</Button>
                                         </td>
                                     </tr>

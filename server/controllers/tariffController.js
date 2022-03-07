@@ -18,14 +18,21 @@ class TariffController {
         if (internet_traffic === -1) {
             '-1.00'
         }
-        const tariff = await Tariff.create({
-            name,
-            subscription_fee,
-            internet_traffic,
-            minutes,
-            sms
-        })
-        return res.json(tariff)
+
+        let t = await Tariff.findOne({where: {name}})
+
+        if (!t) {
+            const tariff = await Tariff.create({
+                name,
+                subscription_fee,
+                internet_traffic,
+                minutes,
+                sms
+            })
+            return res.json(tariff)
+        } else
+            next(ApiError.badRequest(`Тариф ${name} уже добавлен`))
+
     }
 
     async getAll(req, res) {
@@ -71,16 +78,29 @@ class TariffController {
             return next(ApiError.badRequest('Нет тарифа с таким названием!'))
         }
         newInternetTraffic === -1 ? '-1.00' : newInternetTraffic
-        const newTariff = await Tariff.update({
-            name: newName,
-            subscription_fee: newSubscriptionFee,
-            internet_traffic: newInternetTraffic,
-            minutes: newMinutes,
-            sms: newSms
-        }, {
-            where: {name}
-        })
-        return res.json({message: 'Тарифф обновлен!'})
+
+        let t = await Tariff.findOne({where: {
+                name: newName,
+                subscription_fee: newSubscriptionFee,
+                internet_traffic: newInternetTraffic,
+                minutes: newMinutes,
+                sms: newSms
+            }})
+
+        if (!t) {
+            const newTariff = await Tariff.update({
+                name: newName,
+                subscription_fee: newSubscriptionFee,
+                internet_traffic: newInternetTraffic,
+                minutes: newMinutes,
+                sms: newSms
+            }, {
+                where: {name}
+            })
+            return res.json(newTariff)
+        } else
+            next(ApiError.badRequest(`Тариф ${name} не изменён`))
+
     }
 }
 
