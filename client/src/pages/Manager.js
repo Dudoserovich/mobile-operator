@@ -18,7 +18,7 @@ const Manager = observer(() => {
     const [modalTariff, setModalTariff] = useState({})
 
     useEffect(() => {
-        getAllTariffs().then(data => tariff.setTariffs(data))
+        getAllTariffs("").then(data => tariff.setTariffs(data))
     }, [])
 
     const validate = () => {
@@ -48,7 +48,7 @@ const Manager = observer(() => {
     const delTariff = async (name) => {
         try {
             await deleteTariff(name)
-            getAllTariffs().then(data => tariff.setTariffs(data))
+            getAllTariffs("").then(data => tariff.setTariffs(data))
         } catch (e) {
             alert(e.response.data.message)
         }
@@ -73,7 +73,7 @@ const Manager = observer(() => {
             if (document.querySelector('.modalForm div div div .form-control.is-invalid') === null) {
                 try {
                     await changeTariff(props.tariff.name, tariffName, subscriptionFee, internetTraffic, minutes, sms)
-                    getAllTariffs()
+                    getAllTariffs("")
                         .then(data => {tariff.setTariffs(data)
                             alert('Тариф изменён')})
                 } catch (e) {
