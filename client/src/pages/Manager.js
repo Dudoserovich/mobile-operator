@@ -74,7 +74,8 @@ const Manager = observer(() => {
                 try {
                     await changeTariff(props.tariff.name, tariffName, subscriptionFee, internetTraffic, minutes, sms)
                     getAllTariffs()
-                        .then(data => tariff.setTariffs(data))
+                        .then(data => {tariff.setTariffs(data)
+                            alert('Тариф изменён')})
                 } catch (e) {
                     alert(e.response.data.message)
                 }
@@ -179,7 +180,6 @@ const Manager = observer(() => {
                         change().then(data => {
                             if (document.querySelector('.modalForm div div div .form-control.is-invalid') === null) {
                                 props.onHide()
-                                alert('Тариф изменён')
                             }
                         })
                     }}>Сохранить изменения</Button>

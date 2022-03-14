@@ -20,8 +20,8 @@ export const deleteTariff = async (name) => {
     return data
 }
 
-export const getAllTariffs = async () => {
-    const {data} = await $host.get('api/tariff')
+export const getAllTariffs = async (name) => {
+    const {data} = await $host.post('api/tariff/findAll', {name})
     return data
 }
 

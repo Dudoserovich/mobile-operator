@@ -35,9 +35,17 @@ class TariffController {
 
     }
 
-    async getAll(req, res) {
-        const tariffs = await Tariff.findAll()
-        return res.json(tariffs)
+    async getAll(req, res, next) {
+        const {name} = req.body
+        const tariffs = await Tariff.findAll({
+            where: {
+                name: {
+                    [Op.iLike]: '%' + name + '%'
+                }
+            }})
+        if (tariffs)
+            return res.json(tariffs)
+        else return next(ApiError.badRequest('Тарифы не найдены!'))
     }
 
     async getOne(req, res, next) {
@@ -68,7 +76,7 @@ class TariffController {
             return next(ApiError.badRequest('Не верное название тарифа!'))
         }
         await tariff.destroy()
-        return res.json({message: `Тарифф ${name} успешно удален`})
+        return res.json({message: `Тариф ${name} успешно удален`})
     }
 
     async change(req, res, next) {
@@ -80,11 +88,7 @@ class TariffController {
         newInternetTraffic === -1 ? '-1.00' : newInternetTraffic
 
         let t = await Tariff.findOne({where: {
-                name: newName,
-                subscription_fee: newSubscriptionFee,
-                internet_traffic: newInternetTraffic,
-                minutes: newMinutes,
-                sms: newSms
+                name: newName
             }})
 
         if (!t) {

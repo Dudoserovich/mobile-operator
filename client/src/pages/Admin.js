@@ -183,7 +183,7 @@ const Admin = observer(() => {
                             <Form.Control
                                 value={login}
                                 type="text"
-                                onChange={e => setLogin(e.target.value)}
+                                onChange={e => setLogin(e.target.value.replace(/ /g, ''))}
                                 placeholder="Логин"
                                 isInvalid={!(login.length > 0 && login.length <= 32)}
                             />
@@ -200,7 +200,7 @@ const Admin = observer(() => {
                             <Form.Control
                                 value={password}
                                 type="password"
-                                onChange={e => setPassword(e.target.value)}
+                                onChange={e => setPassword(e.target.value.replace(/ /g, ''))}
                                 placeholder="Пароль"
                                 isInvalid={!(password.length > 0 && password.length <= 32)}
                             />

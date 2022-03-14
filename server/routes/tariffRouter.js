@@ -2,7 +2,7 @@ const Router = require('express')
 const router = new Router()
 const tariffController = require('../controllers/tariffController')
 
-router.get('/', tariffController.getAll)
+router.post('/findAll', tariffController.getAll)
 router.get('/:name', tariffController.getOne)
 
 router.post('/', tariffController.create)

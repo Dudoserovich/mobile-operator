@@ -15,8 +15,9 @@ const UserType = sequelize.define('user_type', {
     timestamps: false
 })
 
+// поменяй на string
 const PhoneNumber = sequelize.define('phone_number', {
-    phone_number: {type: DataTypes.BIGINT, primaryKey: true}
+    phone_number: {type: DataTypes.STRING, primaryKey: true}
 }, {
     timestamps: false
 })
@@ -39,7 +40,7 @@ const Tariff = sequelize.define('tariff', {
 })
 
 const Client = sequelize.define('client', {
-    passport: {type: DataTypes.BIGINT, primaryKey: true},
+    passport: {type: DataTypes.STRING, primaryKey: true},
     full_name: {type: DataTypes.STRING},
     date_of_birth: {type: DataTypes.DATE}
 }, {

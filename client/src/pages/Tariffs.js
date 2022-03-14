@@ -9,7 +9,7 @@ const Tariffs = observer(() => {
     const {tariff} = useContext(Context)
 
     useEffect(() => {
-        getAllTariffs()
+        getAllTariffs("")
             .then(data => tariff.setTariffs(data))
     }, [])
 
@@ -25,7 +25,7 @@ const Tariffs = observer(() => {
                     <th>№</th>
                     <th>Название тарифа</th>
                     <th>Абонентская плата</th>
-                    <th>Интернет траффик</th>
+                    <th>Интернет трафик</th>
                     <th>Минуты</th>
                     <th>SMS</th>
                 </tr>

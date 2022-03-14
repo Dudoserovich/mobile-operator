@@ -1,6 +1,7 @@
-const {Client, RegistrationPlace, Subscriber} = require('../models/models')
+const {Client, RegistrationPlace, Subscriber, Tariff} = require('../models/models')
 const ApiError = require('../error/ApiError')
 const {Op} = require("sequelize");
+const {log} = require("nodemon/lib/utils");
 
 class ClientController {
     async getOne(req, res, next) {
@@ -15,11 +16,14 @@ class ClientController {
 
     async findAll(req, res, next) {
         const {passport} = req.body
+        //console.log(passport)
+        if (!passport || passport === ' ')
+            return res.json([])
         const client = await Client.findOne({
             where: {
-                passport: {
+                passport/*: {
                     [Op.eq]: [passport]
-                }
+                }*/
             }
         })
         if (!client) {
@@ -56,6 +60,57 @@ class ClientController {
             registrationPlaceId: regPlace.id
         })
         return res.json({message: 'Клиент успешно создан'})
+    }
+
+    async change(req, res, next) {
+        const {
+            passport,
+            newPassport,
+            full_name,
+            date_of_birth,
+            registrationPlace,
+            oldRegistrationPlace
+        } = req.body
+        /*const bigPass = BigInt(passport)*/
+        const client = await Client.findOne({where: {passport/*: bigPass*/}})
+
+        if (!client) {
+            return next(ApiError.badRequest('Изменяемый клиент не найден'))
+        }
+
+        let findNewReg = await RegistrationPlace.findOne({where: {registration_place: registrationPlace}})
+        const findReg = await RegistrationPlace.findOne({where: {registration_place: oldRegistrationPlace}})
+        //console.log(findReg.dataValues.id)
+        //console.log(findNewReg.dataValues.id)
+        console.log("РЕГИСТРАЦИЯ: " + registrationPlace)
+
+        let c = await Client.findOne({
+                where: {
+                    passport: newPassport,
+                    full_name,
+                    registrationPlaceId: findNewReg ? findNewReg.dataValues.id : 0
+                }
+            }
+        )
+
+        console.log(c)
+
+        if (!c) {
+            if (!findNewReg) {
+                findNewReg = await RegistrationPlace.create({registration_place: registrationPlace})
+                console.log(findNewReg)
+            }
+            const newClient = await Client.update({
+                full_name,
+                date_of_birth,
+                registrationPlaceId: findNewReg.dataValues.id,
+                passport: newPassport
+            }, {
+                where: {passport/*: bigPass*/}
+            })
+            return res.json(newClient)
+        } else
+            next(ApiError.badRequest(`Клиент ${full_name} не изменён`))
     }
 }
 
